@@ -33,26 +33,68 @@ namespace braft {
 typedef std::string GroupId;
 typedef int ReplicaId;
 
+struct EndPoint {
+    std::string hostname;
+    int port;
+
+    EndPoint() : hostname(""), port(0) {}
+    EndPoint(std::string &hostname2, int port2) : hostname(hostname2), port(port2) {}
+
+    int butilEndPoint(butil::EndPoint *ep) {
+        ep->port = port;
+        return butil::hostname2ip(&hostname.c_str(), &ep->ip);
+    }
+};
+
+inline bool operator<(EndPoint p1, EndPoint p2) {
+    return (p1.hostname == p2.hostname) ? (p1.port < p2.port) : (p1.hostname < p2.hostname);
+}
+
+inline bool operator>(EndPoint p1, EndPoint p2) {
+    return p2 < p1;
+}
+
+inline bool operator<=(EndPoint p1, EndPoint p2) {
+    return !(p2 < p1);
+}
+
+inline bool operator>=(EndPoint p1, EndPoint p2) {
+    return !(p1 < p2);
+}
+
+inline bool operator==(EndPoint p1, EndPoint p2) {
+    return p1.hostname == p2.hostname && p1.port == p2.port;
+}
+
+inline bool operator!=(EndPoint p1, EndPoint p2) {
+    return !(p1 == p2);
+}
+
+inline std::ostream& operator<<(std::ostream& os, const EndPoint& ep) {
+    return os << ep.hostname << ':' << ep.port;
+}
+
 // Represent a participant in a replicating group.
 struct PeerId {
-    butil::EndPoint addr; // ip+port.
+    // butil::EndPoint addr; // ip+port.
+    EndPoint addr;
     int idx; // idx in same addr, default 0
 
     PeerId() : idx(0) {}
-    explicit PeerId(butil::EndPoint addr_) : addr(addr_), idx(0) {}
-    PeerId(butil::EndPoint addr_, int idx_) : addr(addr_), idx(idx_) {}
+    explicit PeerId(EndPoint addr_) : addr(addr_), idx(0) {}
+    PeerId(EndPoint addr_, int idx_) : addr(addr_), idx(idx_) {}
     /*intended implicit*/PeerId(const std::string& str) 
     { CHECK_EQ(0, parse(str)); }
     PeerId(const PeerId& id) : addr(id.addr), idx(id.idx) {}
 
     void reset() {
-        addr.ip = butil::IP_ANY;
+        addr.hostname = "";
         addr.port = 0;
         idx = 0;
     }
 
     bool is_empty() const {
-        return (addr.ip == butil::IP_ANY && addr.port == 0 && idx == 0);
+        return (addr.hostname == "" && addr.port == 0 && idx == 0);
     }
 
     int parse(const std::string& str) {
@@ -62,16 +104,17 @@ struct PeerId {
             reset();
             return -1;
         }
-        if (0 != butil::str2ip(ip_str, &addr.ip)) {
-            reset();
-            return -1;
-        }
+        addr.hostname = ip_str;
+        //if (0 != butil::str2ip(ip_str, &addr.ip)) {
+        //    reset();
+        //    return -1;
+        //}
         return 0;
     }
 
     std::string to_string() const {
         char str[128];
-        snprintf(str, sizeof(str), "%s:%d", butil::endpoint2str(addr).c_str(), idx);
+        snprintf(str, sizeof(str), "%s:%d:%d", addr.hostname.c_str(), addr.port, idx);
         return std::string(str);
     }
 };

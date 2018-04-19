@@ -69,23 +69,23 @@ void global_init_once_or_die() {
     }
 }
 
-int add_service(brpc::Server* server, const butil::EndPoint& listen_addr) {
+int add_service(brpc::Server* server, const EndPoint& listen_addr) {
     global_init_once_or_die();
     return NodeManager::GetInstance()->add_service(server, listen_addr);
 }
 
 int add_service(brpc::Server* server, int port) {
-    butil::EndPoint addr(butil::IP_ANY, port);
+    EndPoint addr("", port);
     return add_service(server, addr);
 }
-int add_service(brpc::Server* server, const char* listen_ip_and_port) {
-    butil::EndPoint addr;
-    if (butil::str2endpoint(listen_ip_and_port, &addr) != 0) {
-        LOG(ERROR) << "Fail to parse `" << listen_ip_and_port << "'";
-        return -1;
-    }
-    return add_service(server, addr);
-}
+//int add_service(brpc::Server* server, const char* listen_ip_and_port) {
+//    butil::EndPoint addr;
+//    if (butil::str2endpoint(listen_ip_and_port, &addr) != 0) {
+//        LOG(ERROR) << "Fail to parse `" << listen_ip_and_port << "'";
+//        return -1;
+//    }
+//    return add_service(server, addr);
+//}
 
 Node::Node(const GroupId& group_id, const PeerId& peer_id) {
     _impl = new NodeImpl(group_id, peer_id);

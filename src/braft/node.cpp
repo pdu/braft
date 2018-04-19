@@ -392,7 +392,7 @@ int NodeImpl::init(const NodeOptions& options) {
     _options = options;
 
     // check _server_id
-    if (butil::IP_ANY == _server_id.addr.ip) {
+    if ("" == _server_id.addr.hostname) {
         LOG(ERROR) << "Node can't started from IP_ANY";
         return -1;
     }
@@ -1331,7 +1331,13 @@ void NodeImpl::pre_vote(std::unique_lock<raft_mutex_t>* lck) {
         options.connection_type = brpc::CONNECTION_TYPE_SINGLE;
         options.max_retry = 0;
         brpc::Channel channel;
-        if (0 != channel.Init(iter->addr, &options)) {
+        butil::EndPoint ep;
+        if (iter->addr.butilEndPoint(&ep) != 0) {
+            LOG(WARNING) << "node " << _group_id << ":" << _server_id
+                << " init butil::EndPoint failed, addr " << iter->addr;
+            continue;
+        }
+        if (0 != channel.Init(ep, &options)) {
             LOG(WARNING) << "node " << _group_id << ":" << _server_id
                 << " channel init failed, addr " << iter->addr;
             continue;
@@ -1414,7 +1420,13 @@ void NodeImpl::elect_self(std::unique_lock<raft_mutex_t>* lck) {
         options.connection_type = brpc::CONNECTION_TYPE_SINGLE;
         options.max_retry = 0;
         brpc::Channel channel;
-        if (0 != channel.Init(iter->addr, &options)) {
+        butil::EndPoint ep;
+        if (iter->addr.butilEndPoint(&ep) != 0) {
+            LOG(WARNING) << "node " << _group_id << ":" << _server_id
+                << " butil::EndPoint init failed, addr " << iter->addr;
+            continue; 
+        }
+        if (0 != channel.Init(ep, &options)) {
             LOG(WARNING) << "node " << _group_id << ":" << _server_id
                 << " channel init failed, addr " << iter->addr;
             continue;
