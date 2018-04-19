@@ -40,7 +40,7 @@ struct EndPoint {
     EndPoint() : hostname(""), port(0) {}
     EndPoint(std::string hostname2, int port2) : hostname(hostname2), port(port2) {}
 
-    int butilEndPoint(butil::EndPoint *ep) {
+    int butilEndPoint(butil::EndPoint *ep) const {
         ep->port = port;
         return butil::hostname2ip(hostname.c_str(), &ep->ip);
     }
