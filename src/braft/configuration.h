@@ -42,7 +42,7 @@ struct EndPoint {
 
     int butilEndPoint(butil::EndPoint *ep) {
         ep->port = port;
-        return butil::hostname2ip(&hostname.c_str(), &ep->ip);
+        return butil::hostname2ip(hostname.c_str(), &ep->ip);
     }
 };
 
