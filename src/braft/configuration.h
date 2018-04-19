@@ -44,6 +44,12 @@ struct EndPoint {
         ep->port = port;
         return butil::hostname2ip(hostname.c_str(), &ep->ip);
     }
+
+    std::string to_string() const {
+        char str[128];
+        snprintf(str, sizeof(str), "%s:%d", hostname.c_str(), port);
+        return std::string(str);
+    }
 };
 
 inline bool operator<(EndPoint p1, EndPoint p2) {

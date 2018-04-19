@@ -93,13 +93,15 @@ int Replicator::start(const ReplicatorOptions& options, ReplicatorId *id) {
     brpc::ChannelOptions channel_opt;
     //channel_opt.connect_timeout_ms = *options.heartbeat_timeout_ms;
     channel_opt.timeout_ms = -1; // We don't need RPC timeout
-    butil::EndPoint ep;
-    if (options.peer_id.addr.butilEndPoint(&ep) != 0) {
-        LOG(ERROR) << "Fail to init butil::EndPoint from %s" << options.peer_id.to_string();
-        delete r;
-        return -1;
-    }
-    if (r->_sending_channel.Init(ep, &channel_opt) != 0) {
+    //butil::EndPoint ep;
+    //if (options.peer_id.addr.butilEndPoint(&ep) != 0) {
+    //    LOG(ERROR) << "Fail to init butil::EndPoint from %s" << options.peer_id.to_string();
+    //    delete r;
+    //    return -1;
+    //}
+    std::string ns_url = "http://" + options.peer_id.addr.to_string();
+    std::string lb_name = "rr";
+    if (r->_sending_channel.Init(ns_url.c_str(), lb_name.c_str(), &channel_opt) != 0) {
         LOG(ERROR) << "Fail to init sending channel";
         delete r;
         return -1;
