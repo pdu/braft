@@ -17,6 +17,7 @@
 #ifndef BRAFT_RAFT_SERVICE_H
 #define BRAFT_RAFT_SERVICE_H
 
+#include "braft/configuration.h"
 #include "braft/raft.pb.h"
 
 namespace braft {
