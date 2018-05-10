@@ -107,12 +107,12 @@ struct PeerId {
         reset();
         char ip_str[64] = "";
         if (!str.empty() && str[0] == ':') {
-            if (2 > sscanf(str.c_str(), "%*[:]%d%*[:]%d", &addr.port, &idx)) {
+            if (1 > sscanf(str.c_str(), "%*[:]%d%*[:]%d", &addr.port, &idx)) {
                 reset();
                 return -1;
             }
         } else {
-            if (3 > sscanf(str.c_str(), "%[^:]%*[:]%d%*[:]%d", ip_str, &addr.port, &idx)) {
+            if (2 > sscanf(str.c_str(), "%[^:]%*[:]%d%*[:]%d", ip_str, &addr.port, &idx)) {
                 reset();
                 return -1;
             }

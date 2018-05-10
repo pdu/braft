@@ -38,11 +38,23 @@ TEST_F(TestUsageSuits, PeerId) {
     LOG(NOTICE) << "id:" << id1.to_string();
     LOG(NOTICE) << "id:" << id1;
 
+    ASSERT_EQ(0, id1.parse(":1000:"));
+    LOG(NOTICE) << "id:" << id1.to_string();
+    LOG(NOTICE) << "id:" << id1;
+
     ASSERT_EQ(0, id1.parse("1.1.1.1:1000:0"));
     LOG(NOTICE) << "id:" << id1.to_string();
     LOG(NOTICE) << "id:" << id1;
 
+    ASSERT_EQ(0, id1.parse(":1000:0"));
+    LOG(NOTICE) << "id:" << id1.to_string();
+    LOG(NOTICE) << "id:" << id1;
+
     ASSERT_EQ(0, id1.parse("1.1.1.1:1000"));
+    LOG(NOTICE) << "id:" << id1.to_string();
+    LOG(NOTICE) << "id:" << id1;
+
+    ASSERT_EQ(0, id1.parse(":1000"));
     LOG(NOTICE) << "id:" << id1.to_string();
     LOG(NOTICE) << "id:" << id1;
 
