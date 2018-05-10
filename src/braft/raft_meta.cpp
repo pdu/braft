@@ -97,6 +97,8 @@ int LocalRaftMetaStorage::load() {
     StablePBMeta meta;
     int ret = pb_file.load(&meta);
     if (ret == 0) {
+        // TODO delete me
+        LOG(INFO) << "load local raft meta, term: " << meta.term() << " votedfor: " << meta.votedfor();
         _term = meta.term();
         ret = _votedfor.parse(meta.votedfor());
     } else if (errno == ENOENT) {

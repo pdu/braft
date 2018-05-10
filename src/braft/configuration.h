@@ -104,8 +104,6 @@ struct PeerId {
     }
 
     int parse(const std::string& str) {
-        // TODO delete me
-        LOG(INFO) << "PeerId parse from: " << str;
         reset();
         char ip_str[64];
         if (2 > sscanf(str.c_str(), "%[^:]%*[:]%d%*[:]%d", ip_str, &addr.port, &idx)) {
