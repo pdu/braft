@@ -46,7 +46,7 @@ struct EndPoint {
     }
 
     std::string to_string() const {
-        char str[128];
+        char str[256];
         snprintf(str, sizeof(str), "%s:%d", hostname.c_str(), port);
         return std::string(str);
     }
@@ -105,7 +105,7 @@ struct PeerId {
 
     int parse(const std::string& str) {
         reset();
-        char ip_str[64] = "";
+        char ip_str[256] = "";
         if (!str.empty() && str[0] == ':') {
             if (1 > sscanf(str.c_str(), "%*[:]%d%*[:]%d", &addr.port, &idx)) {
                 reset();
@@ -126,7 +126,7 @@ struct PeerId {
     }
 
     std::string to_string() const {
-        char str[128];
+        char str[256];
         snprintf(str, sizeof(str), "%s:%d:%d", addr.hostname.c_str(), addr.port, idx);
         return std::string(str);
     }
