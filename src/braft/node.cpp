@@ -747,9 +747,9 @@ void NodeImpl::unsafe_register_conf_change(const Configuration& old_conf,
 
 butil::Status NodeImpl::list_peers(std::vector<PeerId>* peers) {
     BAIDU_SCOPED_LOCK(_mutex);
-    if (_state != STATE_LEADER) {
-        return butil::Status(EPERM, "Not leader");
-    }
+    //if (_state != STATE_LEADER) {
+    //    return butil::Status(EPERM, "Not leader");
+    //}
     _conf.conf.list_peers(peers);
     return butil::Status::OK();
 }
