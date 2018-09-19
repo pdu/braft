@@ -164,6 +164,10 @@ butil::Status Node::read_committed_user_log(const int64_t index, UserLog* user_l
     return _impl->read_committed_user_log(index, user_log);
 }
 
+int64_t Node::last_log_index() { 
+    return _impl->last_log_index(); 
+}
+
 // ------------- Iterator
 void Iterator::next() {
     if (valid()) {

@@ -529,7 +529,7 @@ public:
     // in code implementation.
     butil::Status read_committed_user_log(const int64_t index, UserLog* user_log);
 
-    int64_t last_log_index() { return _impl->last_log_index(); }
+    int64_t last_log_index();
 
 private:
     NodeImpl* _impl;
