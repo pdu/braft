@@ -1114,6 +1114,10 @@ void NodeImpl::reset_election_timeout_ms(int election_timeout_ms) {
 
     _election_timer.reset(election_timeout_ms);
 }
+    
+int64_t NodeImpl::last_log_index() { 
+    return _log_manager->last_log_index(); 
+}
 
 void NodeImpl::on_error(const Error& e) {
     LOG(WARNING) << "node " << _group_id << ":" << _server_id

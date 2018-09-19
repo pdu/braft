@@ -210,7 +210,7 @@ public:
 
     bool disable_cli() const { return _options.disable_cli; }
 
-    int64_t last_log_index() { return _log_manager->last_log_index(); }
+    int64_t last_log_index();
 
 private:
 friend class butil::RefCountedThreadSafe<NodeImpl>;
