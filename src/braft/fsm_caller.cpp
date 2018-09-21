@@ -185,9 +185,6 @@ int FSMCaller::on_committed(int64_t committed_index) {
     ApplyTask t;
     t.type = COMMITTED;
     t.committed_index = committed_index;
-    
-    LOG(INFO) << "tracing, fsm on_commited: " << committed_index;
-    
     return bthread::execution_queue_execute(_queue_id, t);
 }
 
@@ -209,7 +206,6 @@ int FSMCaller::on_error(const Error& e) {
     ApplyTask t;
     t.type = ERROR;
     t.done = c;
-    LOG(INFO) << "tracing, fsm on_error";
     if (bthread::execution_queue_execute(_queue_id, t, 
                                          &bthread::TASK_OPTIONS_URGENT) != 0) {
         c->Run();
@@ -243,9 +239,6 @@ void FSMCaller::do_committed(int64_t committed_index) {
     }
     int64_t last_applied_index = _last_applied_index.load(
                                         butil::memory_order_relaxed);
-
-    LOG(INFO) << "tracing, last_applied_index: " << last_applied_index << " committed_index: " << committed_index;
-
     // We can tolerate the disorder of committed_index
     if (last_applied_index >= committed_index) {
         return;
@@ -299,7 +292,6 @@ int FSMCaller::on_snapshot_save(SaveSnapshotClosure* done) {
     ApplyTask task;
     task.type = SNAPSHOT_SAVE;
     task.done = done;
-    LOG(INFO) << "tracing, on_snapshot_save";
     return bthread::execution_queue_execute(_queue_id, task);
 }
 
@@ -339,7 +331,6 @@ int FSMCaller::on_snapshot_load(LoadSnapshotClosure* done) {
     ApplyTask task;
     task.type = SNAPSHOT_LOAD;
     task.done = done;
-    LOG(INFO) << "tracing, fsm on_snapshot_load";
     return bthread::execution_queue_execute(_queue_id, task);
 }
 
@@ -412,7 +403,6 @@ int FSMCaller::on_leader_stop(const butil::Status& status) {
     task.type = LEADER_STOP;
     butil::Status* on_leader_stop_status = new butil::Status(status);
     task.status = on_leader_stop_status;
-    LOG(INFO) << "tracing, fsm on_leader_stop";
     if (bthread::execution_queue_execute(_queue_id, task) != 0) {
         delete on_leader_stop_status;
         return -1;
@@ -424,7 +414,6 @@ int FSMCaller::on_leader_start(int64_t term) {
     ApplyTask task;
     task.type = LEADER_START;
     task.term = term;
-    LOG(INFO) << "tracing, fsm on_leader_start: " << term;
     return bthread::execution_queue_execute(_queue_id, task);
 }
 
@@ -442,7 +431,6 @@ int FSMCaller::on_start_following(const LeaderChangeContext& start_following_con
     LeaderChangeContext* context  = new LeaderChangeContext(start_following_context.leader_id(), 
             start_following_context.term(), start_following_context.status());
     task.leader_change_context = context;
-    LOG(INFO) << "tracing, fsm on_start_following";
     if (bthread::execution_queue_execute(_queue_id, task) != 0) {
         delete context;
         return -1;
@@ -456,7 +444,6 @@ int FSMCaller::on_stop_following(const LeaderChangeContext& stop_following_conte
     LeaderChangeContext* context = new LeaderChangeContext(stop_following_context.leader_id(), 
             stop_following_context.term(), stop_following_context.status());
     task.leader_change_context = context;
-    LOG(INFO) << "tracing, fsm on_stop_following";
     if (bthread::execution_queue_execute(_queue_id, task) != 0) {
         delete context;
         return -1;

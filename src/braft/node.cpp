@@ -478,6 +478,10 @@ int NodeImpl::init(const NodeOptions& options) {
     int64_t last_log_index = _log_manager->last_log_index();
     if (last_log_index > 0) {
         _log_manager->check_and_set_configuration(&_conf);
+        
+        // [FIX] replay the binlog here
+        // if the node cannot become leader or follower because of the network isolation
+        // it will never replay the binlog
         _ballot_box->set_last_committed_index(last_log_index);
     } else {
         _conf.conf = _options.initial_conf;
@@ -1639,9 +1643,6 @@ void LeaderStableClosure::Run() {
     if (status().ok()) {
         if (_ballot_box) {
             // ballot_box check quorum ok, will call fsm_caller
-            
-            LOG(INFO) << "tracing, leader stable closure";
-            
             _ballot_box->commit_at(
                     _first_log_index, _first_log_index + _nentries - 1, _node_id.peer_id);
         }
@@ -1934,9 +1935,6 @@ private:
                          // untrustable so we can't commit them even if their
                          // indexes are less than request->committed_index()
                         );
-
-        LOG(INFO) << "tracing follower stable closure";
-
         //_ballot_box is thread safe and tolerats disorder.
         _node->_ballot_box->set_last_committed_index(committed_index);
     }
@@ -2055,9 +2053,6 @@ void NodeImpl::handle_append_entries_request(brpc::Controller* cntl,
         response->set_last_log_index(_log_manager->last_log_index());
         lck.unlock();
         // see the comments at FollowerStableClosure::run()
-        
-        LOG(INFO) << "tracing, handle_entry";
-        
         _ballot_box->set_last_committed_index(
                 std::min(request->committed_index(),
                          prev_log_index));

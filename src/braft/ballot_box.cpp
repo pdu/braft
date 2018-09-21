@@ -48,9 +48,6 @@ int BallotBox::init(const BallotBoxOptions &options) {
 
 int BallotBox::commit_at(
         int64_t first_log_index, int64_t last_log_index, const PeerId& peer) {
-    
-    LOG(INFO) << "tracing, ballot_box commit_at, first: " << first_log_index << " last:" << last_log_index;
-    
     // FIXME(chenzhangyi01): The cricital section is unacceptable because it 
     // blocks all the other Replicators and LogManagers
     std::unique_lock<raft_mutex_t> lck(_mutex);
@@ -138,9 +135,6 @@ int BallotBox::append_pending_task(const Configuration& conf, const Configuratio
 }
 
 int BallotBox::set_last_committed_index(int64_t last_committed_index) {
-    
-    LOG(INFO) << "tracing ballot_box, set_last_committed_index: " << last_committed_index;
-    
     // FIXME: it seems that lock is not necessary here
     std::unique_lock<raft_mutex_t> lck(_mutex);
     if (_pending_index != 0 || !_pending_meta_queue.empty()) {
