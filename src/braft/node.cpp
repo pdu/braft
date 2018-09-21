@@ -478,11 +478,15 @@ int NodeImpl::init(const NodeOptions& options) {
     int64_t last_log_index = _log_manager->last_log_index();
     if (last_log_index > 0) {
         _log_manager->check_and_set_configuration(&_conf);
-        
-        // [FIX] replay the binlog here
-        // if the node cannot become leader or follower because of the network isolation
-        // it will never replay the binlog
-        _ballot_box->set_last_committed_index(last_log_index);
+       
+        // https://github.com/brpc/braft/issues/64#issuecomment-423469611
+        // cannot apply log here because don't know the actual committed log ID
+        // which may cause the data inconsistence
+        //
+        //// [FIX] replay the binlog here
+        //// if the node cannot become leader or follower because of the network isolation
+        //// it will never replay the binlog
+        //_ballot_box->set_last_committed_index(last_log_index);
     } else {
         _conf.conf = _options.initial_conf;
     }
