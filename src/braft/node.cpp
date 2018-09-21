@@ -475,8 +475,10 @@ int NodeImpl::init(const NodeOptions& options) {
 
     _conf.id = LogId();
     // if have log using conf in log, else using conf in options
-    if (_log_manager->last_log_index() > 0) {
+    int64_t last_log_index = _log_manager->last_log_index();
+    if (last_log_index > 0) {
         _log_manager->check_and_set_configuration(&_conf);
+        _ballot_box->set_last_committed_index(last_log_index);
     } else {
         _conf.conf = _options.initial_conf;
     }
